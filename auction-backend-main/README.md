@@ -81,7 +81,7 @@ For full API details, open `docs/API.md`.
 | Full Name | Role | Student ID |
 |----------|------|-------------|
 | Zahra Aden | Project Manager | 301488294 |
-|            |                 |           |
+| Ron Joshua Concepcion | Web Designer | 301187489 |
 |            |                 |           |
 |            |                 |           |
 |            |                 |           |
