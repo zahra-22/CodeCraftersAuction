@@ -72,3 +72,4 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 
 Zahra Aden – Project Manager – 301488294
+Quinn Nguyen - Backend Developer - 301481370

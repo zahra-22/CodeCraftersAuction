@@ -83,7 +83,7 @@ For full API details, open `docs/API.md`.
 | Zahra Aden | Project Manager         | 301488294 |
 | Ron Joshua Concepcion | Web Designer | 301187489 |
 | Ahmad Moaz | Frontend Deveoper       | 301490756 |
-|            |                 |           |
+| Quinn Nguyen | Backend Developer| 301481370 |
 |            |                 |           |
 
 
