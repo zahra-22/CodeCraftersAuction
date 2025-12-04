@@ -1,8 +1,8 @@
 {
   "name": "auction-backend",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Backend for CodeCrafters Auction App",
+  "main": "src/server.js",
   "scripts": {
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
@@ -10,15 +10,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/qnguyen210/auction-backend.git"
+    "url": "git+https://github.com/zahra-22/CodeCraftersAuction.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Zahra Aden",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/qnguyen210/auction-backend/issues"
+    "url": "https://github.com/zahra-22/CodeCraftersAuction/issues"
   },
-  "homepage": "https://github.com/qnguyen210/auction-backend#readme",
+  "homepage": "https://github.com/zahra-22/CodeCraftersAuction#readme",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.5",

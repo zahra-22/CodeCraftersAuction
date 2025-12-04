@@ -1,36 +1,60 @@
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const connectDB = require('./config/db');
-const authRoutes = require('./routes/authRoutes');
-const auctionRoutes = require('./routes/auctionRoutes');
-const bidRoutes = require('./routes/bidRoutes');
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
+import dotenv from "dotenv";
+import path from "path";
 
-
+// Load .env variables
 dotenv.config();
 
+// Initialize app
 const app = express();
 
-// middleware
-app.use(cors());
+// Middleware
 app.use(express.json());
 
-// connect to MongoDB database 
-connectDB();
+// CORS Configuration
+const allowedOrigins = [
+  "http://localhost:5173",                     // Local Vite dev server
+  "https://code-crafters-auction.vercel.app",  // Your deployed frontend
+];
 
-// simple test route
-app.get('/', (req, res) => {
-  res.json({ message: 'Auction API is running' });
-});
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("CORS blocked: " + origin), false);
+      }
+    },
+    credentials: true,
+  })
+);
 
-// 👉 auth routes
-app.use('/api/auth', authRoutes);
-// 👉 auction routes
-app.use('/api/auctions', auctionRoutes);
+// Import Routes
+import authRoutes from "./routes/auth.routes.js";
+import auctionRoutes from "./routes/auction.routes.js"; // if you have this route
+
+// Use Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/auctions", auctionRoutes); // adjust if your folder name differs
+
+// Database Connection
+mongoose
+  .connect(process.env.MONGODB_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("🌿 MongoDB Connected Successfully"))
+  .catch((err) => console.error("❌ MongoDB Connection Error:", err));
+
+// PORT for Render (Render provides its own port)
 const PORT = process.env.PORT || 4000;
-// 👉 bid routes
-app.use('/api/bids', bidRoutes);
 
+// Start Server
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log(`🚀 Server running on port ${PORT}`);
 });
