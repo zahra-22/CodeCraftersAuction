@@ -21,7 +21,7 @@ async function createAuction(req, res) {
       description: description || '',
       startingPrice,
       currentPrice: startingPrice,
-      seller: req.user._id, // from authMiddleware
+      seller: req.user._id,
       endTime: end,
       status: 'OPEN',
     });
@@ -43,7 +43,6 @@ async function listAuctions(req, res) {
   }
 }
 
-// 🔹 NEW: list auctions for the logged-in user (for Dashboard)
 async function listMyAuctions(req, res) {
   try {
     const auctions = await Auction.find({ seller: req.user._id }).sort({
@@ -75,6 +74,37 @@ async function getAuctionById(req, res) {
   }
 }
 
+// ⭐ NEW: Update auction
+async function updateAuction(req, res) {
+  try {
+    const { id } = req.params;
+    const { title, description, startingPrice } = req.body;
+
+    const auction = await Auction.findById(id);
+    if (!auction) {
+      return res.status(404).json({ message: 'Auction not found' });
+    }
+
+    // Ensure only seller can update
+    if (auction.seller.toString() !== req.user._id.toString()) {
+      return res
+        .status(403)
+        .json({ message: 'You are not the seller of this auction' });
+    }
+
+    auction.title = title;
+    auction.description = description;
+    auction.startingPrice = startingPrice;
+
+    await auction.save();
+
+    return res.json({ message: 'Auction updated', auction });
+  } catch (err) {
+    console.error('updateAuction error:', err.message);
+    return res.status(500).json({ message: 'Server error updating auction' });
+  }
+}
+
 async function closeAuction(req, res) {
   try {
     const { id } = req.params;
@@ -84,7 +114,6 @@ async function closeAuction(req, res) {
       return res.status(404).json({ message: 'Auction not found' });
     }
 
-    // Only seller can close their auction
     if (auction.seller.toString() !== req.user._id.toString()) {
       return res
         .status(403)
@@ -107,7 +136,6 @@ async function closeAuction(req, res) {
   }
 }
 
-// 🔹 OPTIONAL: Delete auction (used by item.html delete button)
 async function deleteAuction(req, res) {
   try {
     const { id } = req.params;
@@ -118,13 +146,12 @@ async function deleteAuction(req, res) {
     }
 
     if (auction.seller.toString() !== req.user._id.toString()) {
-      return res
-        .status(403)
-        .json({ message: 'You are not the seller of this auction' });
+      return res.status(403).json({
+        message: 'You are not the seller of this auction',
+      });
     }
 
     await Auction.deleteOne({ _id: id });
-
     return res.json({ message: 'Auction deleted' });
   } catch (err) {
     console.error('deleteAuction error:', err.message);
@@ -139,4 +166,5 @@ module.exports = {
   getAuctionById,
   closeAuction,
   deleteAuction,
+  updateAuction, // ⭐ EXPORT UPDATE FUNCTION
 };

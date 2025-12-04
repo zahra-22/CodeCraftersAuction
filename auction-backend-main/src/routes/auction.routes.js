@@ -1,5 +1,4 @@
-// src/routes/auctionRoutes.js
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 
 const {
@@ -9,26 +8,30 @@ const {
   getAuctionById,
   closeAuction,
   deleteAuction,
-} = require('../controllers/auctionController');
+  updateAuction,  // ⭐ make sure this is here
+} = require("../controllers/auctionController");
 
-const authMiddleware = require('../middleware/authMiddleware');
+const authMiddleware = require("../middleware/authMiddleware");
 
 // Public: list all auctions
-router.get('/', listAuctions);
+router.get("/", listAuctions);
 
-//  Must be BEFORE '/:id'
-router.get('/mine', authMiddleware, listMyAuctions);
+// Must be before "/:id"
+router.get("/mine", authMiddleware, listMyAuctions);
 
 // Public: get one auction by id
-router.get('/:id', getAuctionById);
+router.get("/:id", getAuctionById);
 
-// Protected: create auction
-router.post('/', authMiddleware, createAuction);
+// ⭐ NEW update route
+router.put("/:id", authMiddleware, updateAuction);
 
-// Protected: close auction
-router.post('/:id/close', authMiddleware, closeAuction);
+// Protected create
+router.post("/", authMiddleware, createAuction);
 
-// Protected: delete auction (used in item.html)
-router.delete('/:id', authMiddleware, deleteAuction);
+// Protected close
+router.post("/:id/close", authMiddleware, closeAuction);
+
+// Protected delete
+router.delete("/:id", authMiddleware, deleteAuction);
 
 module.exports = router;
