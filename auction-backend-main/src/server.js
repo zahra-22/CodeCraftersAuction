@@ -2,7 +2,6 @@ import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
 import dotenv from "dotenv";
-import path from "path";
 
 // Load .env variables
 dotenv.config();
@@ -22,8 +21,7 @@ const allowedOrigins = [
 app.use(
   cors({
     origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or curl)
-      if (!origin) return callback(null, true);
+      if (!origin) return callback(null, true); // Allow requests with no origin (Postman, mobile apps)
       if (allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
@@ -34,15 +32,23 @@ app.use(
   })
 );
 
+// ======================
 // Import Routes
+// ======================
 import authRoutes from "./routes/auth.routes.js";
-import auctionRoutes from "./routes/auction.routes.js"; // if you have this route
+import auctionRoutes from "./routes/auction.routes.js";
+import bidRoutes from "./routes/bid.routes.js";   // Only if this file exists
 
+// ======================
 // Use Routes
+// ======================
 app.use("/api/auth", authRoutes);
-app.use("/api/auctions", auctionRoutes); // adjust if your folder name differs
+app.use("/api/auctions", auctionRoutes);
+app.use("/api/bids", bidRoutes); // If bid.routes.js exists
 
+// ======================
 // Database Connection
+// ======================
 mongoose
   .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
@@ -51,10 +57,11 @@ mongoose
   .then(() => console.log("🌿 MongoDB Connected Successfully"))
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 
-// PORT for Render (Render provides its own port)
-const PORT = process.env.PORT || 4000;
-
+// ======================
 // Start Server
+// ======================
+const PORT = process.env.PORT || 4000; // Render overrides PORT automatically
+
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
