@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const axiosClient = axios.create({
-  baseURL: "https://codecraftersauction.onrender.com",  
+  baseURL: "https://codecraftersauction.onrender.com/api",
 });
 
 axiosClient.interceptors.request.use((config) => {
