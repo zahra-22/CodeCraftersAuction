@@ -11,7 +11,7 @@ export default function EditItem() {
   const [price, setPrice] = useState("");
   const [success, setSuccess] = useState("");
 
-  // Load existing data
+ 
   useEffect(() => {
     axiosClient
       .get(`/auctions/${id}`)
@@ -23,7 +23,7 @@ export default function EditItem() {
       .catch((err) => console.log(err));
   }, [id]);
 
-  // Update item
+
   const handleUpdate = (e) => {
     e.preventDefault();
 

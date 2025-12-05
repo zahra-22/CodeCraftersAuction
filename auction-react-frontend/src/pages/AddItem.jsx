@@ -13,7 +13,7 @@ export default function AddItem() {
 
   const handleAdd = async (e) => {
     e.preventDefault();
-    setError(""); // clear previous errors
+    setError(""); 
 
     try {
       await axiosClient.post("/auctions", {
