@@ -10,7 +10,7 @@ async function placeBid(req, res) {
     const { auctionId } = req.params;
     const { amount } = req.body;
 
-    // Validate bid amount
+   
     if (amount === undefined || typeof amount !== "number") {
       return res.status(400).json({ message: "Bid amount must be a number" });
     }
