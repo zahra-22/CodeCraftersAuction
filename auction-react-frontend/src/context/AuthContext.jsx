@@ -7,6 +7,13 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
 
+  // ⭐ Central logout function
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    setUser(null);
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -21,9 +28,8 @@ export function AuthProvider({ children }) {
         localStorage.setItem("userId", res.data._id);
       })
       .catch(() => {
-        localStorage.removeItem("token");
-        localStorage.removeItem("userId");
-        setUser(null);
+        //  If token is invalid → auto logout
+        logout();
       })
       .finally(() => setCheckingAuth(false));
   }, []);
@@ -33,7 +39,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ user, setUser, logout }}>
       {children}
     </AuthContext.Provider>
   );

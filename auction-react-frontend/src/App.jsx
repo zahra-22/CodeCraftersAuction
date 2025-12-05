@@ -19,11 +19,13 @@ export default function App() {
         <Navbar />
 
         <Routes>
+          {/* Public routes */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/item/:id" element={<ItemDetails />} />
 
+          {/* Protected routes */}
           <Route
             path="/add"
             element={

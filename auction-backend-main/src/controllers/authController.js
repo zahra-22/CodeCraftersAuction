@@ -1,84 +1,95 @@
+const User = require("../models/User");
 const bcrypt = require("bcryptjs");
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const jwt = require("jsonwebtoken");
 
-function generateToken(id) {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-}
-
-// POST /api/auth/register
+// =======================
+// REGISTER USER
+// =======================
 async function registerUser(req, res) {
   try {
     const { username, email, password } = req.body;
 
     if (!username || !email || !password) {
-      return res.status(400).json({ message: 'username, email, and password are required' });
+      return res.status(400).json({ message: "All fields are required" });
     }
 
-    // check if user exists
-    const exists = await User.findOne({ email });
-    if (exists) {
-      return res.status(400).json({ message: 'User with that email already exists' });
+    // Check if user already exists
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ message: "Email already in use" });
     }
 
-    // hash password
-    const hashed = await bcrypt.hash(password, 10);
+    const usernameExists = await User.findOne({ username });
+    if (usernameExists) {
+      return res.status(400).json({ message: "Username already taken" });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
       username,
       email,
-      password: hashed,
+      password: hashedPassword,
     });
 
-    return res.status(201).json({
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      token: generateToken(user._id),
-    });
+    return res.status(201).json({ message: "User registered", user });
   } catch (err) {
-    console.error('Register error:', err.message);
-    return res.status(500).json({ message: 'Server error during registration' });
+    console.error("registerUser error:", err);
+    res.status(500).json({ message: "Server error during registration" });
   }
 }
 
-// POST /api/auth/login
+// =======================
+// LOGIN USER
+// =======================
 async function loginUser(req, res) {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ message: 'email and password are required' });
-    }
-
+    // Check user
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) {
-      return res.status(400).json({ message: 'Invalid credentials' });
+    // Check password
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ message: "Invalid credentials" });
     }
 
-    return res.json({
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      token: generateToken(user._id),
+    // Generate JWT
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "7d",
+    });
+
+    res.json({
+      message: "Login successful",
+      token,
+      user,
     });
   } catch (err) {
-    console.error('Login error:', err.message);
-    return res.status(500).json({ message: 'Server error during login' });
+    console.error("loginUser error:", err);
+    res.status(500).json({ message: "Server error during login" });
   }
 }
 
-// GET /api/auth/me
+// =======================
+// GET CURRENT LOGGED-IN USER
+// =======================
 async function getMe(req, res) {
-  // req.user is set by authMiddleware
-  return res.json(req.user);
+  try {
+    const user = await User.findById(req.user._id).select("-password");
+
+    res.json(user);
+  } catch (err) {
+    console.error("getMe error:", err);
+    res.status(500).json({ message: "Server error fetching user" });
+  }
 }
 
+// EXPORT CONTROLLERS
 module.exports = {
   registerUser,
   loginUser,

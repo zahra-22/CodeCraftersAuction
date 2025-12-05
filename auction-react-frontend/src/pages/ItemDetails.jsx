@@ -23,7 +23,7 @@ export default function ItemDetails() {
   const loadBids = () => {
     axiosClient
       .get(`/bids/${id}`)
-      .then((res) => setBids(res.data.reverse())) // newest first
+      .then((res) => setBids(res.data.reverse()))
       .catch(() => {});
   };
 
@@ -34,6 +34,12 @@ export default function ItemDetails() {
 
   if (!item) return <p style={{ padding: 20 }}>Loading...</p>;
 
+  // ⭐ FIX: Show username or email (fallback)
+  const sellerDisplay =
+    item.seller?.username ||
+    item.seller?.email ||
+    "Unknown Seller";
+
   const handleBid = (e) => {
     e.preventDefault();
     setMessage("");
@@ -43,8 +49,8 @@ export default function ItemDetails() {
       .then(() => {
         setMessage("Bid placed successfully!");
         setBidAmount("");
-        loadAuction(); // refresh auction price
-        loadBids();    // refresh bid history
+        loadAuction();
+        loadBids();
       })
       .catch((err) =>
         setMessage(err.response?.data?.message || "Something went wrong")
@@ -55,9 +61,12 @@ export default function ItemDetails() {
     <div style={styles.container}>
       <h1>{item.title}</h1>
       <p>{item.description}</p>
+
       <p><strong>Current Price:</strong> ${item.currentPrice}</p>
       <p><strong>Status:</strong> {item.status}</p>
-      <p><strong>Seller:</strong> {item.seller?.username}</p>
+
+      {/* ⭐ FIXED SELLER DISPLAY */}
+      <p><strong>Seller:</strong> {sellerDisplay}</p>
 
       {/* Bidding Form */}
       {user && item.status === "OPEN" && item.seller?._id !== user._id && (
@@ -102,7 +111,7 @@ export default function ItemDetails() {
         <ul style={styles.bidList}>
           {bids.map((b) => (
             <li key={b._id}>
-              • <strong>{b.bidder?.username || "Someone"}</strong> placed ${b.amount}
+              • <strong>{b.bidder?.username || b.bidder?.email || "Someone"}</strong> placed ${b.amount}
             </li>
           ))}
         </ul>
@@ -111,6 +120,7 @@ export default function ItemDetails() {
   );
 }
 
+// =========== STYLES ===========
 const styles = {
   container: { padding: 20 },
   bidForm: { marginTop: 20, display: "flex", gap: 10 },

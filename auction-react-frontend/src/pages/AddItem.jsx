@@ -9,39 +9,93 @@ export default function AddItem() {
   const [description, setDescription] = useState("");
   const [startingPrice, setStartingPrice] = useState("");
   const [endTime, setEndTime] = useState("");
+  const [error, setError] = useState("");   // ⭐ NEW: Show errors to user
 
-  const handleAdd = (e) => {
+  const handleAdd = async (e) => {
     e.preventDefault();
+    setError(""); // clear previous errors
 
-    axiosClient
-      .post("/auctions", {
+    try {
+      await axiosClient.post("/auctions", {
         title,
         description,
         startingPrice: Number(startingPrice),
         endTime,
-      })
-      .then(() => navigate("/profile"))
-      .catch((err) => console.log(err));
+      });
+
+      navigate("/profile");
+    } catch (err) {
+      // ⭐ Backend validation error from API
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
+      console.log(err);
+    }
   };
 
   return (
     <div style={{ padding: 20 }}>
       <h1>Add New Auction Item</h1>
 
-      <form onSubmit={handleAdd} style={{ display: "flex", flexDirection: "column", gap: 12, maxWidth: 400 }}>
-        <input type="text" placeholder="Item Title" value={title}
-          onChange={(e) => setTitle(e.target.value)} required />
+      {/* ⭐ NEW: Display error message */}
+      {error && (
+        <div style={{
+          background: "#ffdddd",
+          color: "#b30000",
+          padding: "10px",
+          marginBottom: "15px",
+          borderRadius: "5px",
+          border: "1px solid #b30000"
+        }}>
+          {error}
+        </div>
+      )}
 
-        <textarea placeholder="Description" value={description}
-          onChange={(e) => setDescription(e.target.value)} rows="4" required />
+      <form
+        onSubmit={handleAdd}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 12,
+          maxWidth: 400,
+        }}
+      >
+        <input
+          type="text"
+          placeholder="Item Title"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          required
+        />
 
-        <input type="number" placeholder="Starting Price" value={startingPrice}
-          onChange={(e) => setStartingPrice(e.target.value)} required />
+        <textarea
+          placeholder="Description"
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          rows="4"
+          required
+        />
 
-        <input type="datetime-local" value={endTime}
-          onChange={(e) => setEndTime(e.target.value)} required />
+        <input
+          type="number"
+          placeholder="Starting Price"
+          value={startingPrice}
+          onChange={(e) => setStartingPrice(e.target.value)}
+          required
+        />
 
-        <button style={{ background: "#222", color: "white", padding: 10 }}>Add Item</button>
+        <input
+          type="datetime-local"
+          value={endTime}
+          onChange={(e) => setEndTime(e.target.value)}
+          required
+        />
+
+        <button style={{ background: "#222", color: "white", padding: 10 }}>
+          Add Item
+        </button>
       </form>
     </div>
   );

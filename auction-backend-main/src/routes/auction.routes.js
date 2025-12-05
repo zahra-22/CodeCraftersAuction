@@ -8,7 +8,7 @@ const {
   getAuctionById,
   closeAuction,
   deleteAuction,
-  updateAuction,  // ⭐ make sure this is here
+  updateAuction,
 } = require("../controllers/auctionController");
 
 const authMiddleware = require("../middleware/authMiddleware");
@@ -16,22 +16,22 @@ const authMiddleware = require("../middleware/authMiddleware");
 // Public: list all auctions
 router.get("/", listAuctions);
 
-// Must be before "/:id"
+// User's auctions
 router.get("/mine", authMiddleware, listMyAuctions);
 
-// Public: get one auction by id
-router.get("/:id", getAuctionById);
-
-// ⭐ NEW update route
-router.put("/:id", authMiddleware, updateAuction);
-
-// Protected create
+// Protected: create
 router.post("/", authMiddleware, createAuction);
 
-// Protected close
+// Protected: update auction
+router.put("/:id", authMiddleware, updateAuction);
+
+// Protected: close auction
 router.post("/:id/close", authMiddleware, closeAuction);
 
-// Protected delete
+// Protected: delete auction
 router.delete("/:id", authMiddleware, deleteAuction);
+
+// Public: get auction by id (MUST BE LAST)
+router.get("/:id", getAuctionById);
 
 module.exports = router;
