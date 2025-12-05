@@ -14,7 +14,7 @@ export default function Home() {
 
   return (
     <div style={styles.container}>
-      <h1>All Auction Items</h1>
+      <h1>All Auction Items For Sale</h1>
 
       <div style={styles.grid}>
         {items.map((item) => (
